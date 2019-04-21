@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Distress alerts</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+       
+      }
+      .marker {
+        background-image: url('../static/blip.png');
+        background-size: cover;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .mapboxgl-popup {
+        max-width: 200px;
+      }
+
+      .mapboxgl-popup-content {
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+      }
+      @media screen and (max-width: 600px) {
+        .disp{flex-direction: column;}
+
+        #map {
+          float: none;
+          width: 100%;
+        }
+        
+      }
+    
+
+    </style>
+</head>
+<body>
+
+
+
+<div id='map' ></div>
+
+
+  <form>
+
+  </form>
+</div>
+
+<script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiaHNpdnBhIiwiYSI6ImNqdDhqdnJ3dDA5bHg0M3FrbDF2czZtdXAifQ.4_DCulx6RSk9nQsfX7FKdQ';
+
+var map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v10',
+  zoom: 0.8
+});
+
+var geojson = JSON.parse($.getJSON({'url': "../static/features.json", 'async': false}).responseText);
+
+geojson.features.push({
+
+        "properties": {
+          "place_name": "Test",
+          "type": "test",
+          "wid":"dummy"
+        },
+        "geometry": {
+          "coordinates": [
+            35,
+            55
+          ],
+        
+        },
+      });
+    
+  var txt = JSON.stringify(geojson);
+console.log(geojson);
+
+geojson.features.forEach(function(marker) {
+
+// create a HTML element for each feature
+var el = document.createElement('div');
+el.className = 'marker';
+
+// make a marker for each feature and add to the map
+new mapboxgl.Marker(el)
+  .setLngLat(marker.geometry.coordinates)
+  .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+    .setHTML('<h3>' + marker.properties.place_name+ '</h3><p>' + marker.properties.type + '</p>'+'<a href= "donation.html?wid="'+marker.properties.wid+'><button> Donate </button></a>'+'<a href= "#"><button> View </button></a>'))
+  .addTo(map);
+});
+
+
+</script>
+
+</body>
+</html>

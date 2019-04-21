@@ -1,1 +1,1 @@
-For integration. fixed system.
+Inventory with view and add to map

@@ -1,10 +1,12 @@
-from flask import Flask, render_template, url_for, redirect, abort
+from flask import Flask, render_template, url_for, redirect, abort, request
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 from wtforms import validators, Form
 import os
+import json
+import urllib
 
 app = Flask(__name__)
 app.config['demo'] = os.environ.get('IS_DEMO', False)
@@ -251,6 +253,29 @@ admin.add_view(ModelViewProductStock(
     ProductStock, db.session, name='Product Stock'))
 admin.add_view(ModelViewProduct(Product, db.session, category="Master"))
 admin.add_view(ModelViewLocation(Location, db.session, category="Master"))
+
+
+@app.route('/add_map', methods=['GET','POST'])
+def add_map():
+    name=request.args.get('value')
+    print("HERE",name)
+    print("TYPE IS", type(name))
+    val=json.dumps(name, indent=4)
+    wr=val[1:-1].replace('\\','')
+    wr=wr.replace('"[','[')
+    wr=wr.replace(']"',']')
+    wr=wr.replace('[{"p','{"p')
+    wr=wr.replace(']]',']')
+    if wr!="ul":
+        jf = open("static/features.json","w") 
+        jf.write(wr)
+        jf.close()
+    return render_template('addloc.html')
+
+
+@app.route('/mapview')
+def view_map():
+    return render_template('map.html')
 
 
 @app.route('/favicon.ico')
